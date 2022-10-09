@@ -2,11 +2,22 @@ cmake_minimum_required(VERSION 3.18.0)
 
 project(elf_entrypoint_hook VERSION 0.1.0)
 
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# set(DOBBY_GENERATE_SHARED OFF)
+# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+add_subdirectory(third_party)
 
 add_library(hook
     SHARED
+    src/elf_util.cpp
+    src/elf_util.hpp
     src/lib.cpp
+)
+
+target_link_libraries(hook
+    PRIVATE
+    dobby
+    pthread
 )
 
 set_target_properties(hook
