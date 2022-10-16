@@ -4,8 +4,9 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "dobby.h"
 #include "elf_util.hpp"
+/* #include "dobby.h" */
+#include "third_party/inline-hook/hooker/HookerFactory.h"
 
 auto test(int argc, const char *const argv[]) -> int {
   printf("Replaced main of %s\n", argv[0]);
@@ -28,7 +29,7 @@ __attribute__((constructor)) static void init() {
   printf("Loaded\n");
 
   pid_t pid = getpid();
-  std::string command = "cat /proc/" + std::to_string(pid) + "/maps";
+  auto command = "cat /proc/" + std::to_string(pid) + "/maps";
   system(command.c_str());
 
   // auto *addr = get_self_address();
@@ -46,8 +47,15 @@ __attribute__((constructor)) static void init() {
   printf("Elf: %s\n", elf.name().c_str());
   void *main_address = elf.getSymbAddress("main");
   printf("main: %p\n", main_address);
-  dobby_dummy_func_t original_main;
-  DobbyHook(main_address, reinterpret_cast<dobby_dummy_func_t>(test),
-            &original_main);
+
+  /* dobby_dummy_func_t original_main; */
+  /* DobbyHook(main_address, reinterpret_cast<dobby_dummy_func_t>(test), */
+  /*           &original_main); */
+
+  auto factory = hooker::HookerFactory::getInstance();
+  auto &hooker = factory->getHooker();
+
+  hooker.hook(main_address, reinterpret_cast<void *>(test), nullptr);
+
   printf("After hooking\n");
 }

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.18.0)
 project(elf_entrypoint_hook VERSION 0.1.0)
 
 # set(DOBBY_GENERATE_SHARED OFF)
-# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(third_party)
 
@@ -14,10 +14,14 @@ add_library(hook
     src/lib.cpp
 )
 
+target_include_directories(hook
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}
+)
+
 target_link_libraries(hook
     PRIVATE
-    dobby
-    pthread
+    inline-hook
 )
 
 set_target_properties(hook
